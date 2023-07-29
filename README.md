@@ -1,4 +1,4 @@
-**Autotelnet.py**
+**auto-telnet.py**
 
 **Description:**
 
@@ -13,10 +13,10 @@ Additionally, the program has an additional feature that will attempt to execute
 
 **How to Run:**
 1. Open a terminal or command prompt.
-2. Navigate to the directory where "Autotelnet.py" is located.
+2. Navigate to the directory where "auto-telnet.py" is located.
 3. Run the following command:
    ```
-   python3 Autotelnet.py
+   python3 auto-telnet.py
    ```
 4. Enter the URL containing the host and port information when prompted.
 5. The program will display the generated telnet command on the screen.
