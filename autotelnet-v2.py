@@ -79,7 +79,7 @@ def main():
                 print(f"Tidak dapat mengambil IP dari domain {parsed_url.hostname}")
         else:
             print("Telnet tidak terhubung.")
-            ip = None  # Set IP to None since Telnet failed
+            ip = "None - Cannot get IP address"  # Set IP to None since Telnet failed
         
         print("------------------------------")
 
