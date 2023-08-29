@@ -6,6 +6,7 @@ import select
 import requests
 from urllib.parse import urlparse
 from socket import gethostbyname
+from requests.exceptions import ConnectionError
 
 def get_ip_port_from_url(url):
     # Mencari IP dan port dalam URL menggunakan regular expression
@@ -92,6 +93,8 @@ def main():
             print("Response dari endpoint:")
             print(f"HTTP Status Code: {response.status_code}")
             print(response.text)
+        except ConnectionError as gagal:
+            print(f"Tidak mendapatkan respon dari endpoint (Error: {gagal})")
         except requests.Timeout:
             print("Tidak mendapatkan respons dari endpoint (Timeout / Blacklisted IP)")
 
