@@ -1,7 +1,6 @@
 import requests
 import json
 from urllib.parse import urlparse
-from socket import gethostbyname
 from requests.exceptions import ConnectionError
 
 # Fungsi untuk mendapatkan masukan dari pengguna
@@ -30,6 +29,13 @@ def get_ip_port_from_url(url):
 
     return ip, port
 
+def get_ip_from_domain(domain):
+    try:
+        ip = socket.gethostbyname(domain)
+        return ip
+    except:
+        return None
+
 # ... (bagian lain dari kode Anda tetap sama)
 
 def main():
@@ -53,7 +59,7 @@ def main():
             response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=10)
         elif method == "POST":
             # Menggunakan json.dumps untuk mengonversi dictionary body ke JSON string yang valid
-            response = requests.post(url, headers=json.loads(headers) if headers else {}, data=json.dumps(body), timeout=10)
+            response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=10)
 
         print("Response dari endpoint:")
         print(f"HTTP Status Code: {response.status_code}")
