@@ -1,8 +1,3 @@
-import re
-import subprocess
-import time
-import os
-import select
 import requests
 import json
 from urllib.parse import urlparse
@@ -18,14 +13,11 @@ def get_user_input():
     return url, method, headers, body
 
 def get_ip_port_from_url(url):
-    pattern = r'https?://([^:/]+)(?::(\d+))?(?:/|$)'
-    match = re.search(pattern, url)
-    if match:
-        ip = match.group(1)
-        port = match.group(2) or '80'
-        return ip, port
-    else:
-        return None, None
+    parsed_url = urlparse(url)
+    ip = parsed_url.hostname
+    port = parsed_url.port or 80
+
+    return ip, port
 
 def get_ip_from_domain(domain):
     try:
@@ -46,67 +38,35 @@ def main():
 
     print("------------------------------")
 
-    if ip and port:
-        telnet_command = f'telnet {ip} {port}'
-        print("Perintah Telnet:")
-        print(telnet_command)
+    try:
+        response = None
+        if method == "GET":
+            response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=10)
+        elif method == "POST":
+            response = requests.post(url, headers=json.loads(headers) if headers else {}, data=body, timeout=10)
+        # tambahkan blok if untuk metode HTTP lainnya (PUT, DELETE, dll.) sesuai kebutuhan
 
-        telnet_process = subprocess.Popen(telnet_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("Response dari endpoint:")
+        print(f"HTTP Status Code: {response.status_code}")
+        print(response.text)
 
-        timeout = 10
-        poll_obj = select.poll()
-        poll_obj.register(telnet_process.stdout, select.POLLIN)
-        poll_obj.register(telnet_process.stderr, select.POLLIN)
-
-        start_time = time.time()
-        output = None
-        while time.time() - start_time < timeout:
-            if poll_obj.poll(0):
-                output = os.read(telnet_process.stdout.fileno(), 1024).decode()
-                if output:
-                    print(output.strip())
-            time.sleep(1)
-
-        telnet_process.terminate()
-        telnet_process.wait()
-
-        if output:
-            print("Telnet berhasil terhubung.")
-            resolved_ip = get_ip_from_domain(parsed_url.hostname)
-            if resolved_ip:
-                ip = resolved_ip
-            else:
-                print(f"Tidak dapat mengambil IP dari domain {parsed_url.hostname}")
+        resolved_ip = get_ip_from_domain(parsed_url.hostname)
+        if resolved_ip:
+            ip = resolved_ip
         else:
-            print("Telnet tidak terhubung.")
-            ip = "None - Cannot get IP address"
+            print(f"Tidak dapat mengambil IP dari domain {parsed_url.hostname}")
 
-        print("------------------------------")
+    except ConnectionError as e:
+        print(f"Tidak mendapatkan respon dari endpoint (Error: {e})")
+    except requests.Timeout:
+        print("Tidak mendapatkan respons dari endpoint (Timeout)")
 
-        try:
-            response = None
-            if method == "GET":
-                response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=timeout)
-            elif method == "POST":
-                response = requests.post(url, headers=json.loads(headers) if headers else {}, data=body, timeout=timeout)
-            # tambahkan blok if untuk metode HTTP lainnya (PUT, DELETE, dll.) sesuai kebutuhan
+    print("------------------------------")
 
-            print("Response dari endpoint:")
-            print(f"HTTP Status Code: {response.status_code}")
-            print(response.text)
-
-        except Exception as e:
-            print(f"Terjadi kesalahan: {e}")
-
-        print("------------------------------")
-
-        print("Detail endpoint:")
-        print(f"URL: {url}")
-        print(f"IP: {ip}")
-        print(f"Port: {port}")
-
-    else:
-        print("URL tidak valid atau tidak mengandung IP dan port.")
+    print("Detail endpoint:")
+    print(f"URL: {url}")
+    print(f"IP: {ip}")
+    print(f"Port: {port}")
 
 if __name__ == "__main__":
     main()
