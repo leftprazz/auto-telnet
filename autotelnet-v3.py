@@ -22,6 +22,14 @@ def get_user_input():
 
     return url, method, headers, body
 
+# Fungsi untuk mendapatkan IP dan port dari URL
+def get_ip_port_from_url(url):
+    parsed_url = urlparse(url)
+    ip = parsed_url.hostname
+    port = parsed_url.port or 80
+
+    return ip, port
+
 # ... (bagian lain dari kode Anda tetap sama)
 
 def main():
