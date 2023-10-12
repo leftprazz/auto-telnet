@@ -21,22 +21,6 @@ def get_user_input():
 
     return url, method, headers, body
 
-# Fungsi untuk mendapatkan IP dan port dari URL
-def get_ip_port_from_url(url):
-    parsed_url = urlparse(url)
-    ip = parsed_url.hostname
-    port = parsed_url.port or 80
-
-    return ip, port
-
-def get_ip_from_domain(domain):
-    try:
-        ip = socket.gethostbyname(domain)
-        return ip
-    except:
-        return None
-
-# ... (bagian lain dari kode Anda tetap sama)
 
 def main():
     url, method, headers, body = get_user_input()
@@ -48,8 +32,6 @@ def main():
     if parsed_url.scheme not in ('http', 'https'):
         print("URL tidak valid atau tidak menggunakan protokol HTTP atau HTTPS.")
         return
-
-    ip, port = get_ip_port_from_url(url)
 
     print("------------------------------")
 
@@ -65,12 +47,6 @@ def main():
         print(f"HTTP Status Code: {response.status_code}")
         print(response.text)
 
-        resolved_ip = get_ip_from_domain(parsed_url.hostname)
-        if resolved_ip:
-            ip = resolved_ip
-        else:
-            print(f"Tidak dapat mengambil IP dari domain {parsed_url.hostname}")
-
     except ConnectionError as e:
         print(f"Tidak mendapatkan respon dari endpoint (Error: {e})")
     except requests.Timeout:
@@ -80,8 +56,6 @@ def main():
 
     print("Detail endpoint:")
     print(f"URL: {url}")
-    print(f"IP: {ip}")
-    print(f"Port: {port}")
 
 if __name__ == "__main__":
     main()
