@@ -41,10 +41,10 @@ def main():
         try:
             response = None
             if method == "GET":
-                response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=10)
+                response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=3600)
             elif method == "POST":
                 # Menggunakan json.dumps untuk mengonversi dictionary body ke JSON string yang valid
-                response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=10)
+                response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=3600)
 
             end_time = time.time()  # Waktu setelah menerima response
             total_time = end_time - start_time  # Menghitung total waktu
