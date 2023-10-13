@@ -21,41 +21,46 @@ def get_user_input():
 
     return url, method, headers, body
 
-
 def main():
-    url, method, headers, body = get_user_input()
+    while True:
+        url, method, headers, body = get_user_input()
 
-    if body is None:
-        return
+        if body is None:
+            return
 
-    parsed_url = urlparse(url)
-    if parsed_url.scheme not in ('http', 'https'):
-        print("URL tidak valid atau tidak menggunakan protokol HTTP atau HTTPS.")
-        return
+        parsed_url = urlparse(url)
+        if parsed_url.scheme not in ('http', 'https'):
+            print("URL tidak valid atau tidak menggunakan protokol HTTP atau HTTPS.")
+            return
 
-    print("------------------------------")
+        print("------------------------------")
 
-    try:
-        response = None
-        if method == "GET":
-            response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=10)
-        elif method == "POST":
-            # Menggunakan json.dumps untuk mengonversi dictionary body ke JSON string yang valid
-            response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=10)
+        try:
+            response = None
+            if method == "GET":
+                response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=10)
+            elif method == "POST":
+                # Menggunakan json.dumps untuk mengonversi dictionary body ke JSON string yang valid
+                response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=10)
 
-        print("Response dari endpoint:")
-        print(f"HTTP Status Code: {response.status_code}")
-        print(response.text)
+            print("Response dari endpoint:")
+            print(f"HTTP Status Code: {response.status_code}")
+            print(response.text)
 
-    except ConnectionError as e:
-        print(f"Tidak mendapatkan respon dari endpoint (Error: {e})")
-    except requests.Timeout:
-        print("Tidak mendapatkan respons dari endpoint (Timeout)")
+        except ConnectionError as e:
+            print(f"Tidak mendapatkan respon dari endpoint (Error: {e})")
+        except requests.Timeout:
+            print("Tidak mendapatkan respons dari endpoint (Timeout)")
 
-    print("------------------------------")
+        print("------------------------------")
 
-    print("Detail endpoint:")
-    print(f"URL: {url}")
+        print("Detail endpoint:")
+        print(f"URL: {url}")
+
+        # Meminta input dari pengguna untuk menentukan apakah ingin menjalankan program lagi atau tidak
+        ulangi = input("Apakah Anda ingin menjalankan program lagi? (ya/tidak): ").lower()
+        if ulangi != 'ya':
+            break
 
 if __name__ == "__main__":
     main()
