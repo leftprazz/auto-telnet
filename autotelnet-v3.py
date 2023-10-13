@@ -2,6 +2,7 @@ import requests
 import json
 from urllib.parse import urlparse
 from requests.exceptions import ConnectionError
+import time
 
 # Fungsi untuk mendapatkan masukan dari pengguna
 def get_user_input():
@@ -35,6 +36,8 @@ def main():
 
         print("------------------------------")
 
+        start_time = time.time()  # Waktu awal sebelum mengirim request
+
         try:
             response = None
             if method == "GET":
@@ -43,9 +46,13 @@ def main():
                 # Menggunakan json.dumps untuk mengonversi dictionary body ke JSON string yang valid
                 response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=10)
 
+            end_time = time.time()  # Waktu setelah menerima response
+            total_time = end_time - start_time  # Menghitung total waktu
+
             print("Response dari endpoint:")
             print(f"HTTP Status Code: {response.status_code}")
             print(response.text)
+            print(f"Total waktu yang dibutuhkan: {total_time:.2f} detik")
 
         except ConnectionError as e:
             print(f"Tidak mendapatkan respon dari endpoint (Error: {e})")
