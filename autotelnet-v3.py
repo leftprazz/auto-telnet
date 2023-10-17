@@ -53,14 +53,16 @@ def get_user_input():
     return url, method, headers, body
 
 def main():
-    previous_url = ""
+    previous_url = "None"
     previous_method = "None"
+    previous_body = None
 
     while True:
         print("------------------------------")
         print("Pilihan Sebelumnya:")
         print(f"URL: {previous_url}")
         print(f"Metode: {previous_method}")
+        print(f"Body: {previous_body}")
         print("------------------------------")
 
         use_previous = input("Gunakan endpoint dan metode sebelumnya? (ya/tidak): ").lower()
@@ -68,21 +70,20 @@ def main():
         if use_previous == 'ya':
             url = previous_url
             method = previous_method
+            body = previous_body
         else:
             url, method, headers, body = get_user_input()
 
             if body is None:
                 return
 
-            if not url:
-                url = previous_url
-            if not method:
-                method = previous_method
-
         parsed_url = urlparse(url)
         if parsed_url.scheme not in ('http', 'https'):
             print("URL tidak valid atau tidak menggunakan protokol HTTP atau HTTPS.")
             continue
+
+        if body is None and previous_body is not None:
+            body = previous_body
 
         print("------------------------------")
 
@@ -113,8 +114,10 @@ def main():
         print("Detail endpoint:")
         print(f"URL: {url}")
 
+        # Menyimpan nilai endpoint, metode, dan body untuk penggunaan berikutnya
         previous_url = url
         previous_method = method
+        previous_body = body
 
         ulangi = input("Apakah Anda ingin menjalankan program lagi? (ya/tidak): ").lower()
         if ulangi != 'ya':
