@@ -53,31 +53,50 @@ def get_user_input():
     return url, method, headers, body
 
 def main():
-    while True:
-        url, method, headers, body = get_user_input()
+    previous_url = ""
+    previous_method = "None"
 
-        if body is None:
-            return
+    while True:
+        print("------------------------------")
+        print("Pilihan Sebelumnya:")
+        print(f"URL: {previous_url}")
+        print(f"Metode: {previous_method}")
+        print("------------------------------")
+
+        use_previous = input("Gunakan endpoint dan metode sebelumnya? (ya/tidak): ").lower()
+
+        if use_previous == 'ya':
+            url = previous_url
+            method = previous_method
+        else:
+            url, method, headers, body = get_user_input()
+
+            if body is None:
+                return
+
+            if not url:
+                url = previous_url
+            if not method:
+                method = previous_method
 
         parsed_url = urlparse(url)
         if parsed_url.scheme not in ('http', 'https'):
             print("URL tidak valid atau tidak menggunakan protokol HTTP atau HTTPS.")
-            return
+            continue
 
         print("------------------------------")
 
-        start_time = time.time()  # Waktu awal sebelum mengirim request
+        start_time = time.time()
 
         try:
             response = None
             if method == "GET":
                 response = requests.get(url, headers=json.loads(headers) if headers else {}, timeout=3600)
             elif method == "POST":
-                # Menggunakan json.dumps untuk mengonversi dictionary body ke JSON string yang valid
                 response = requests.post(url, headers=json.loads(headers) if headers else {}, json=body, timeout=3600)
 
-            end_time = time.time()  # Waktu setelah menerima response
-            total_time = end_time - start_time  # Menghitung total waktu
+            end_time = time.time()
+            total_time = end_time - start_time
 
             print("Response dari endpoint:")
             print(f"HTTP Status Code: {response.status_code}")
@@ -94,7 +113,9 @@ def main():
         print("Detail endpoint:")
         print(f"URL: {url}")
 
-        # Meminta input dari pengguna untuk menentukan apakah ingin menjalankan program lagi atau tidak
+        previous_url = url
+        previous_method = method
+
         ulangi = input("Apakah Anda ingin menjalankan program lagi? (ya/tidak): ").lower()
         if ulangi != 'ya':
             break
