@@ -6,12 +6,42 @@ import time
 
 # Fungsi untuk mendapatkan masukan dari pengguna
 def get_user_input():
-    url = input("Masukkan URL: ")
-    method = input("Pilih Metode HTTP (GET/POST/PUT/DELETE, dll.): ").upper()
+    raw_url = input("Masukkan URL: ").strip()
+
+    # Menambahkan protokol HTTP jika belum ada
+    if not raw_url.startswith(('http://', 'https://')):
+        protocol_choice = input("Pilih protokol sesuai nomor (1. HTTP / 2. HTTPS): ").strip()
+        if protocol_choice == '1':
+            raw_url = 'http://' + raw_url
+        elif protocol_choice == '2':
+            raw_url = 'https://' + raw_url
+        else:
+            print("Pilihan protokol tidak valid. Menggunakan HTTPS sebagai default.")
+            raw_url = 'https://' + raw_url
+
+    url = raw_url
+    method_choice = input("Pilih Metode sesuai nomor (1. GET / 2. POST / 3. PUT / 4. DELETE ): ").strip()
+    
+    # Mengecek pilihan metode yang dimasukkan oleh pengguna
+    if method_choice == '1':
+        method = 'GET'
+    elif method_choice == '2':
+        method = 'POST'
+    elif method_choice == '3':
+        method = 'PUT'
+    elif method_choice == '4':
+        method = 'DELETE'
+    else:
+        print("Pilihan metode tidak valid. Menggunakan GET sebagai default.")
+        method = 'GET'
+
     headers = input("Masukkan Headers (opsional, contoh: 'key:value,key2:value2'): ").strip()
 
     # Input body dalam bentuk Python dictionary
-    body_input = input("Masukkan Body (opsional, untuk metode POST/PUT, dll.): ").strip()
+    print("Masukkan Body (opsional, untuk metode POST/PUT, dll.): ")
+    print("Contoh JSON Body: {'key': 'value', 'key2': 'value2'}")
+    print("Gunakan tanda kutip (') untuk string di dalam JSON.")
+    body_input = input("JSON Body: ").strip()
 
     # Mengonversi input body ke bentuk dictionary
     try:
