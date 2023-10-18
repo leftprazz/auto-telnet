@@ -4,11 +4,9 @@ from urllib.parse import urlparse
 from requests.exceptions import ConnectionError
 import time
 
-# Fungsi untuk mendapatkan masukan dari pengguna
-def get_user_input():
+def get_user_input(previous_body=None):
     raw_url = input("Masukkan URL: ").strip()
 
-    # Menambahkan protokol HTTP jika belum ada
     if not raw_url.startswith(('http://', 'https://')):
         protocol_choice = input("Pilih protokol sesuai nomor (1. HTTP / 2. HTTPS): ").strip()
         if protocol_choice == '1':
@@ -21,8 +19,7 @@ def get_user_input():
 
     url = raw_url
     method_choice = input("Pilih Metode sesuai nomor (1. GET / 2. POST / 3. PUT / 4. DELETE ): ").strip()
-    
-    # Mengecek pilihan metode yang dimasukkan oleh pengguna
+
     if method_choice == '1':
         method = 'GET'
     elif method_choice == '2':
@@ -37,24 +34,44 @@ def get_user_input():
 
     headers = input("Masukkan Headers (opsional, contoh: 'key:value,key2:value2'): ").strip()
 
-    # Input body dalam bentuk Python dictionary
-    print("Masukkan Body (opsional, untuk metode POST/PUT, dll.): ")
-    print("Contoh JSON Body: {'key': 'value', 'key2': 'value2'}")
-    print("Gunakan tanda kutip (') untuk string di dalam JSON.")
-    body_input = input("JSON Body: ").strip()
+    if previous_body:
+        print(f"Body Sebelumnya: {json.dumps(previous_body, indent=4)}")
+        modify_body = input("Apakah Anda ingin memodifikasi body sebelumnya? (ya/tidak): ").lower()
+        if modify_body == 'ya':
+            body = get_modified_body(previous_body)
+        else:
+            body = previous_body
+    else:
+        print("Masukkan Body (opsional, untuk metode POST/PUT, dll.): ")
+        print("Contoh JSON Body: {'key': 'value', 'key2': 'value2'}")
+        print("Gunakan tanda kutip (') untuk string di dalam JSON.")
+        body_input = input("JSON Body: ").strip()
 
-    # Mengonversi input body ke bentuk dictionary
-    try:
-        body = json.loads(body_input)
-    except json.JSONDecodeError:
-        print("Format JSON tidak valid.")
-        return None, None, None, None
+        try:
+            body = json.loads(body_input)
+        except json.JSONDecodeError:
+            print("Format JSON tidak valid.")
+            return None, None, None, None
 
     return url, method, headers, body
 
+def get_modified_body(previous_body):
+    print("Masukkan Body yang Dimodifikasi:")
+    print("Contoh JSON Body: {'key': 'value', 'key2': 'value2'}")
+    print("Gunakan tanda kutip (') untuk string di dalam JSON.")
+    modified_body_input = input("JSON Body: ").strip()
+
+    try:
+        modified_body = json.loads(modified_body_input)
+    except json.JSONDecodeError:
+        print("Format JSON tidak valid.")
+        return get_modified_body(previous_body)
+
+    return modified_body
+
 def main():
-    previous_url = "None"
-    previous_method = "None"
+    previous_url = None
+    previous_method = None
     previous_body = None
 
     while True:
@@ -67,23 +84,18 @@ def main():
 
         use_previous = input("Gunakan endpoint dan metode sebelumnya? (ya/tidak): ").lower()
 
-        if use_previous == 'ya':
-            url = previous_url
-            method = previous_method
-            body = previous_body
+        if use_previous == 'ya' and previous_url:
+            url, method, headers, body = get_user_input(previous_body)
         else:
             url, method, headers, body = get_user_input()
 
-            if body is None:
-                return
+        if body is None:
+            return
 
         parsed_url = urlparse(url)
         if parsed_url.scheme not in ('http', 'https'):
             print("URL tidak valid atau tidak menggunakan protokol HTTP atau HTTPS.")
             continue
-
-        if body is None and previous_body is not None:
-            body = previous_body
 
         print("------------------------------")
 
@@ -114,9 +126,7 @@ def main():
         print("Detail endpoint:")
         print(f"URL: {url}")
 
-        # Menyimpan nilai endpoint, metode, dan body untuk penggunaan berikutnya
         previous_url = url
-        previous_method = method
         previous_body = body
 
         ulangi = input("Apakah Anda ingin menjalankan program lagi? (ya/tidak): ").lower()
