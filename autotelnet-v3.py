@@ -128,6 +128,7 @@ def main():
 
         previous_url = url
         previous_body = body
+        previous_method = method
 
         ulangi = input("Apakah Anda ingin menjalankan program lagi? (ya/tidak): ").lower()
         if ulangi != 'ya':
